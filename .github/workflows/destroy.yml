@@ -1,33 +1,38 @@
-name: Deploy Environment
+name: Destroy Environment
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: 'Environment to destroy'
         required: true
-        default: 'dev'
         type: choice
         options:
           - dev
           - test
           - prod
+      confirm:
+        description: 'Type the environment name to confirm destruction'
+        required: true
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy to ${{ github.event.inputs.environment || 'dev' }}
+  destroy:
+    name: Destroy ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    # Map the environment to GitHub environments for secret protection
-    environment: ${{ github.event.inputs.environment || 'dev' }}
-
+    environment: ${{ github.event.inputs.environment }}
+    
     steps:
+      - name: Verify confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "${{ github.event.inputs.environment }}" ]; then
+            echo "❌ Confirmation does not match environment name!"
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -35,7 +40,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: github-actions-deploy
+          role-session-name: github-actions-destroy
           aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
 
       - name: Setup Terraform
@@ -43,17 +48,11 @@ jobs:
         with:
           terraform_wrapper: false
 
-      - name: Terraform Init and Plan
-        run: |
-          terraform init
-          terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
-        working-directory: ./terraform
-
-      - name: Run Deploy Script
+      - name: Run Destroy Script
         run: |
           export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
-          chmod +x scripts/deploy.sh
-          ./scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
+          chmod +x twin/scripts/destroy.sh
+          ./twin/scripts/destroy.sh ${{ github.event.inputs.environment }}
         env:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
