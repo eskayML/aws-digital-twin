@@ -45,6 +45,11 @@ jobs:
           echo "Verifying S3 access..."
           aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}
 
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Create dummy zip for Terraform Plan
         run: |
           mkdir -p twin/backend
