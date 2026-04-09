@@ -109,17 +109,16 @@ def call_bedrock(conversation: List[Dict], user_message: str) -> str:
     # Build messages in Bedrock format
     messages = []
     
-    # Add system prompt as first user message
-    # Or there's a better way to do this - pass in system=[{"text": prompt()}] to the converse call below
-    messages.append({
-        "role": "user", 
-        "content": [{"text": f"System: {prompt()}"}]
-    })
+    # Correct handling of conversation history:
+    # 1. We must alternate User/Assistant roles
+    # 2. Bedrock Converse API prefers the system prompt in the system field, not messages
     
-    # Add conversation history (limit to last 25 exchanges)
-    for msg in conversation[-50:]:
+    # Filter and format conversation history
+    for msg in conversation[-20:]: # Last 10 exchanges
+        # Ensure role is strictly 'user' or 'assistant'
+        role = "assistant" if msg["role"] == "assistant" else "user"
         messages.append({
-            "role": msg["role"],
+            "role": role,
             "content": [{"text": msg["content"]}]
         })
     
@@ -130,10 +129,11 @@ def call_bedrock(conversation: List[Dict], user_message: str) -> str:
     })
     
     try:
-        # Call Bedrock using the converse API
+        # Call Bedrock using the converse API with proper system prompt placement
         response = bedrock_client.converse(
             modelId=BEDROCK_MODEL_ID,
             messages=messages,
+            system=[{"text": prompt()}],
             inferenceConfig={
                 "maxTokens": 2000,
                 "temperature": 0.7,
