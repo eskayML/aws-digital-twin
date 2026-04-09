@@ -1,6 +1,8 @@
 # This file creates the S3 bucket and DynamoDB table for Terraform state
 # Run this once per AWS account
 
+# Moved to a separate setup phase or imported
+/*
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "twin-terraform-state-${data.aws_caller_identity.current.account_id}"
   
@@ -54,11 +56,21 @@ resource "aws_dynamodb_table" "terraform_locks" {
     ManagedBy   = "terraform"
   }
 }
+*/
+
+# Use data sources instead to avoid "Already Exists" errors
+data "aws_s3_bucket" "terraform_state" {
+  bucket = "twin-terraform-state-${data.aws_caller_identity.current.account_id}"
+}
+
+data "aws_dynamodb_table" "terraform_locks" {
+  name = "twin-terraform-locks"
+}
 
 output "state_bucket_name" {
-  value = aws_s3_bucket.terraform_state.id
+  value = data.aws_s3_bucket.terraform_state.id
 }
 
 output "dynamodb_table_name" {
-  value = aws_dynamodb_table.terraform_locks.name
+  value = data.aws_dynamodb_table.terraform_locks.name
 }

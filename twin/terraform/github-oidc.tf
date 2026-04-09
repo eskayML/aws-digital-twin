@@ -6,14 +6,12 @@ variable "github_repository" {
   type        = string
 }
 
-resource "aws_iam_openid_connect_provider" "github" {
+# Check for existing provider before creating
+data "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
-  
-  client_id_list = ["sts.amazonaws.com"]
-  
-  thumbprint_list = ["1b511abead59c6ce207077c0bf0e0043b1382612"]
 }
 
+# The role remains managed by terraform, but we'll use the existing provider
 resource "aws_iam_role" "github_actions" {
   name = "github-actions-twin-deploy"
   
@@ -23,7 +21,7 @@ resource "aws_iam_role" "github_actions" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.github.arn
+          Federated = data.aws_iam_openid_connect_provider.github.arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
