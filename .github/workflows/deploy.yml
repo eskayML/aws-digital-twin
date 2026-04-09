@@ -39,7 +39,11 @@ jobs:
           aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
 
       - name: Debug AWS Identity
-        run: aws sts get-caller-identity
+        run: |
+          echo "Checking identity..."
+          aws sts get-caller-identity
+          echo "Checking S3 access..."
+          aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }} || echo "S3 access failed"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
