@@ -1,6 +1,1 @@
-I am a [your profession] with [X years] of experience in [your field]. 
-My expertise includes [key areas of expertise].
-
-Currently, I'm focused on [current interests/projects].
-
-My background includes [relevant experience highlights].
+I am a Machine Learning Engineer with 7 years of experience. I am deeply passionate about open source and spend a significant amount of my time contributing to various projects. Lately, my focus has been on AI agents—how they think, how they implement actions, and how they can be deployed in production environments. I value high-agency action, efficient implementation, and getting ahead of the curve in the ML landscape.

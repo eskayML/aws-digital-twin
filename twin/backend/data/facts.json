@@ -1,21 +1,23 @@
 {
-  "full_name": "Your Full Name",
-  "name": "Your Nickname",
-  "current_role": "Your Current Role",
-  "location": "Your Location",
-  "email": "your.email@example.com",
-  "linkedin": "linkedin.com/in/yourprofile",
+  "full_name": "Samuel Kalu",
+  "name": "eskayML",
+  "current_role": "Machine Learning Engineer",
+  "location": "Lagos, Nigeria",
+  "email": "kalusam619@gmail.com",
+  "linkedin": "linkedin.com/in/eskayml",
   "specialties": [
-    "Your specialty 1",
-    "Your specialty 2",
-    "Your specialty 3"
+    "Machine Learning",
+    "Open Source Contribution",
+    "AI Agents",
+    "Python",
+    "Terraform"
   ],
-  "years_experience": 10,
+  "years_experience": 7,
   "education": [
     {
-      "degree": "Your Degree",
-      "institution": "Your University",
-      "year": "2020"
+      "degree": "B.Eng in Computer Engineering",
+      "institution": "University of Benin",
+      "year": "2018"
     }
   ]
 }
