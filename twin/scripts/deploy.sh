@@ -55,10 +55,10 @@ cd ../frontend
 echo "📝 Setting API URL for production..."
 echo "NEXT_PUBLIC_API_URL=$API_URL" > .env.production
 
-# Use --prefer-offline or check for package-lock to speed up if needed, 
-# but for GH Actions we ensure a fresh install
-npm ci || npm install
-npm run build
+# Use pnpm as requested for a reliable build
+echo "🏗️ Installing frontend dependencies with pnpm..."
+pnpm install
+pnpm run build
 aws s3 sync ./out "s3://$FRONTEND_BUCKET/" --delete
 cd ..
 
