@@ -24,7 +24,6 @@ jobs:
   deploy:
     name: Deploy to ${{ github.event.inputs.environment || 'dev' }}
     runs-on: ubuntu-latest
-    # Map the environment to GitHub environments for secret protection
     environment: ${{ github.event.inputs.environment || 'dev' }}
 
     steps:
@@ -38,24 +37,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
           aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
 
-      - name: Debug AWS Identity
-        run: |
-          echo "Checking identity..."
-          aws sts get-caller-identity
-          echo "Verifying S3 access..."
-          aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: twin/frontend/package-lock.json
 
       - name: Create dummy zip for Terraform Plan
         run: |
@@ -71,8 +61,6 @@ jobs:
       - name: Terraform Init and Plan
         run: |
           STATE_BUCKET="twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}"
-          
-          # We use github-actions.tfstate to keep it clean from any local locks
           terraform init \
             -backend-config="bucket=${STATE_BUCKET}" \
             -backend-config="key=github-actions.tfstate" \
@@ -81,7 +69,6 @@ jobs:
             -backend-config="encrypt=true" \
             -reconfigure \
             -input=false
-            
           terraform plan -var="environment=${{ github.event.inputs.environment || 'dev' }}" -var="project_name=twin" -var="github_repository=${{ github.repository }}" -out=tfplan
         working-directory: ./twin/terraform
 
@@ -90,7 +77,6 @@ jobs:
           export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
           chmod +x twin/scripts/deploy.sh
-          # Pass the account ID and region explicitly to the script
           ./twin/scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
