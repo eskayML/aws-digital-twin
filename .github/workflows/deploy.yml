@@ -34,22 +34,16 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: github-actions-deploy
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
 
       - name: Debug AWS Identity
         run: |
           echo "Checking identity..."
           aws sts get-caller-identity
-          echo "Checking S3 access to bucket..."
-          # This test will tell us if it's a bucket-level block or something else
-          aws s3api get-bucket-location --bucket twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }} || echo "Cannot even see the bucket"
-          echo "Listing bucket contents..."
-          aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }} || echo "Cannot list objects"
-          echo "Attempting to write a test file..."
-          echo "test" > test.txt
-          aws s3 cp test.txt s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}/test-permission.txt && echo "WRITE SUCCESS" || echo "WRITE FAILED"
+          echo "Checking S3 access..."
+          aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
