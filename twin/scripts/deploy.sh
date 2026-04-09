@@ -33,7 +33,7 @@ else
 fi
 
 # Use prod.tfvars for production environment
-COMMON_VARS=(-var="project_name=$PROJECT_NAME" -var="environment=$ENVIRONMENT" -var="github_repository=${GITHUB_REPOSITORY:-eskayML/aws-digital-twin}")
+COMMON_VARS=(-var="project_name=$PROJECT_NAME" -var="environment=$ENVIRONMENT" -var="github_repository=${GITHUB_REPOSITORY:-eskayML/aws-digital-twin}" -var="openai_api_key=$OPENAI_API_KEY")
 
 if [ "$ENVIRONMENT" = "prod" ]; then
   TF_APPLY_CMD=(terraform apply -var-file=prod.tfvars "${COMMON_VARS[@]}" -auto-approve)

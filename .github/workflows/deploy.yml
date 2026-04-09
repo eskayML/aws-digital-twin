@@ -74,13 +74,14 @@ jobs:
             -backend-config="encrypt=true" \
             -reconfigure \
             -input=false
-          terraform plan -var="environment=${{ github.event.inputs.environment || 'dev' }}" -var="project_name=twin" -var="github_repository=${{ github.repository }}" -out=tfplan
+          terraform plan -var="environment=${{ github.event.inputs.environment || 'dev' }}" -var="project_name=twin" -var="github_repository=${{ github.repository }}" -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}" -out=tfplan
         working-directory: ./twin/terraform
 
       - name: Run Deploy Script
         run: |
           export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
+          export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           chmod +x twin/scripts/deploy.sh
           ./twin/scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
         env:
