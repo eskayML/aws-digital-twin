@@ -33,10 +33,12 @@ else
 fi
 
 # Use prod.tfvars for production environment
+COMMON_VARS=(-var="project_name=$PROJECT_NAME" -var="environment=$ENVIRONMENT" -var="github_repository=${GITHUB_REPOSITORY:-eskayML/aws-digital-twin}")
+
 if [ "$ENVIRONMENT" = "prod" ]; then
-  TF_APPLY_CMD=(terraform apply -var-file=prod.tfvars -var="project_name=$PROJECT_NAME" -var="environment=$ENVIRONMENT" -auto-approve)
+  TF_APPLY_CMD=(terraform apply -var-file=prod.tfvars "${COMMON_VARS[@]}" -auto-approve)
 else
-  TF_APPLY_CMD=(terraform apply -var="project_name=$PROJECT_NAME" -var="environment=$ENVIRONMENT" -auto-approve)
+  TF_APPLY_CMD=(terraform apply "${COMMON_VARS[@]}" -auto-approve)
 fi
 
 echo "🎯 Applying Terraform..."
