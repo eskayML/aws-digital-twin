@@ -9,7 +9,7 @@ export default function Home() {
             Samuel Kalu Digital Twin
           </h1>
           <p className="text-center text-gray-600 mb-8">
-            AI in Production • Powered by AWS Bedrock
+            High-Agency ML Operator & Open Source Contributor
           </p>
 
           <div className="h-[600px]">
