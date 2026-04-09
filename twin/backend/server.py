@@ -32,8 +32,9 @@ bedrock_client = boto3.client(
     region_name=os.getenv("DEFAULT_AWS_REGION", "us-east-1")
 )
 
-# Bedrock model selection - see Q42 on https://edwarddonner.com/faq for more
-BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "global.amazon.nova-2-lite-v1:0")
+# Bedrock model selection
+# Note: Claude 3.5 Sonnet is available in us-east-1 and is extremely reliable
+BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "us.anthropic.claude-3-5-sonnet-20240620-v1:0")
 
 # Memory storage configuration
 USE_S3 = os.getenv("USE_S3", "false").lower() == "true"
