@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "Checking identity..."
           aws sts get-caller-identity
-          echo "Checking S3 access..."
+          echo "Verifying S3 access..."
           aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}
 
       - name: Setup Terraform
@@ -52,9 +52,9 @@ jobs:
 
       - name: Terraform Init and Plan
         run: |
-          # Use a unique key for the GitHub Actions state to avoid conflicts with local state
           STATE_BUCKET="twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}"
           
+          # We use github-actions.tfstate to keep it clean from any local locks
           terraform init \
             -backend-config="bucket=${STATE_BUCKET}" \
             -backend-config="key=github-actions.tfstate" \
@@ -71,6 +71,8 @@ jobs:
           export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
           chmod +x twin/scripts/deploy.sh
+          # Pass the account ID and region explicitly to the script
           ./twin/scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
         env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
