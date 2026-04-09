@@ -50,6 +50,13 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: twin/frontend/package-lock.json
+
       - name: Create dummy zip for Terraform Plan
         run: |
           mkdir -p twin/backend
