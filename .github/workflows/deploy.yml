@@ -72,6 +72,7 @@ jobs:
             -backend-config="region=${{ secrets.DEFAULT_AWS_REGION }}" \
             -backend-config="dynamodb_table=twin-terraform-locks" \
             -backend-config="encrypt=true" \
+            -reconfigure \
             -input=false
             
           terraform plan -var="environment=${{ github.event.inputs.environment || 'dev' }}" -var="project_name=twin" -var="github_repository=${{ github.repository }}" -out=tfplan

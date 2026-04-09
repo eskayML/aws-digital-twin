@@ -19,10 +19,11 @@ STATE_BUCKET="twin-terraform-state-${AWS_ACCOUNT_ID}"
 
 terraform init \
   -backend-config="bucket=${STATE_BUCKET}" \
-  -backend-config="key=terraform.tfstate" \
+  -backend-config="key=github-actions.tfstate" \
   -backend-config="region=${DEFAULT_AWS_REGION}" \
   -backend-config="dynamodb_table=twin-terraform-locks" \
   -backend-config="encrypt=true" \
+  -reconfigure \
   -input=false
 
 if ! terraform workspace list | grep -q "$ENVIRONMENT"; then
