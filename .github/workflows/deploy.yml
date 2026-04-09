@@ -63,7 +63,7 @@ jobs:
             -backend-config="encrypt=true" \
             -input=false
             
-          terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -var="github_repository=${{ github.repository }}" -out=tfplan
+          terraform plan -var="environment=${{ github.event.inputs.environment || 'dev' }}" -var="project_name=twin" -var="github_repository=${{ github.repository }}" -out=tfplan
         working-directory: ./twin/terraform
 
       - name: Run Deploy Script
