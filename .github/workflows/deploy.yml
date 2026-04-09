@@ -45,6 +45,12 @@ jobs:
           echo "Verifying S3 access..."
           aws s3 ls s3://twin-terraform-state-${{ secrets.AWS_ACCOUNT_ID }}
 
+      - name: Create dummy zip for Terraform Plan
+        run: |
+          mkdir -p twin/backend
+          touch twin/backend/lambda-deployment.zip
+          echo "Placeholder for plan" > twin/backend/lambda-deployment.zip
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
