@@ -84,6 +84,15 @@ jobs:
           export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           chmod +x twin/scripts/deploy.sh
           ./twin/scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
+          
+          # Invalidate CloudFront cache so changes show up immediately
+          echo "🧹 Invalidating CloudFront cache..."
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].Id=='S3-twin-${{ github.event.inputs.environment || 'dev' }}-frontend-${{ secrets.AWS_ACCOUNT_ID }}'].Id" --output text)
+          if [ "$DISTRIBUTION_ID" != "None" ] && [ -n "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          else
+            echo "⚠️ Could not find Distribution ID for invalidation"
+          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
