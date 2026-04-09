@@ -18,21 +18,20 @@ echo "🗑️ Preparing to destroy ${PROJECT_NAME}-${ENVIRONMENT} infrastructure
 # Navigate to terraform directory
 cd "$(dirname "$0")/../terraform"
 
-# Check if workspace exists
-if ! terraform workspace list | grep -q "$ENVIRONMENT"; then
-    echo "❌ Error: Workspace '$ENVIRONMENT' does not exist"
-    echo "Available workspaces:"
-    terraform workspace list
-    exit 1
-fi
-
-# Select the workspace
-terraform workspace select "$ENVIRONMENT"
-
-echo "📦 Emptying S3 buckets..."
-
 # Get AWS Account ID for bucket names
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+DEFAULT_AWS_REGION=$(aws configure get region)
+
+# The S3 backend requires configuration since it's empty in backend.tf
+STATE_BUCKET="twin-terraform-state-${AWS_ACCOUNT_ID}"
+
+terraform init \
+  -backend-config="bucket=${STATE_BUCKET}" \
+  -backend-config="key=terraform.tfstate" \
+  -backend-config="region=${DEFAULT_AWS_REGION:-us-east-1}" \
+  -backend-config="dynamodb_table=twin-terraform-locks" \
+  -backend-config="encrypt=true" \
+  -input=false
 
 # Get bucket names with account ID
 FRONTEND_BUCKET="${PROJECT_NAME}-${ENVIRONMENT}-frontend-${AWS_ACCOUNT_ID}"

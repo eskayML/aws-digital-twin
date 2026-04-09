@@ -13,7 +13,17 @@ echo "📦 Building Lambda package..."
 
 # 2. Terraform workspace & apply
 cd terraform
-terraform init -input=false
+
+# The S3 backend requires configuration since it's empty in backend.tf
+STATE_BUCKET="twin-terraform-state-${AWS_ACCOUNT_ID}"
+
+terraform init \
+  -backend-config="bucket=${STATE_BUCKET}" \
+  -backend-config="key=terraform.tfstate" \
+  -backend-config="region=${DEFAULT_AWS_REGION}" \
+  -backend-config="dynamodb_table=twin-terraform-locks" \
+  -backend-config="encrypt=true" \
+  -input=false
 
 if ! terraform workspace list | grep -q "$ENVIRONMENT"; then
   terraform workspace new "$ENVIRONMENT"
